@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Malam Kuis Angker</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <main id="game" class="game">
+
+    <!-- Adegan ruangan -->
+    <div id="scene" class="scene" aria-label="Ruangan angker">
+      <div id="room" class="room">
+        <div class="room-wall"></div>
+        <div class="room-floor"></div>
+        <div id="room-door" class="room-door"></div>
+        <div id="room-window" class="room-window"></div>
+      </div>
+
+      <!-- Hantu -->
+      <button id="ghost" class="ghost hidden" aria-label="Hantu">
+        <span id="ghost-body" class="ghost-body"></span>
+        <span id="ghost-name" class="ghost-name">Pocong</span>
+        <span class="ghost-hp" aria-hidden="true">
+          <span id="ghost-hp-fill" class="ghost-hp-fill"></span>
+        </span>
+      </button>
+
+      <!-- Efek senjata saat memukul -->
+      <div id="weapon-fx" class="weapon-fx hidden" aria-hidden="true"></div>
+      <div id="damage-pop" class="damage-pop hidden" aria-live="polite">-0</div>
+
+      <!-- Lapisan gelap, vignette, dan kedip lampu -->
+      <div id="vignette" class="vignette" aria-hidden="true"></div>
+      <div id="flicker" class="flicker" aria-hidden="true"></div>
+      <div id="jumpscare" class="jumpscare hidden" aria-hidden="true">
+        <span id="jumpscare-text" class="jumpscare-text">BOO!</span>
+      </div>
+    </div>
+
+    <!-- HUD saat bermain -->
+    <header id="hud" class="hud hidden">
+      <div class="hud-item">
+        <span class="hud-label">Skor</span>
+        <span id="hud-score" class="hud-value">0</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">Ruangan</span>
+        <span id="hud-room" class="hud-value">1</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">Nyawa</span>
+        <span id="hud-lives" class="hud-value" aria-live="polite">3</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">Streak</span>
+        <span id="hud-streak" class="hud-value">0</span>
+      </div>
+    </header>
+
+    <!-- Meter: jarak hantu, sanity, baterai senter -->
+    <aside id="meters" class="meters hidden" aria-label="Status bertahan hidup">
+      <div class="meter">
+        <span class="meter-label">Jarak hantu</span>
+        <div class="meter-track"><div id="meter-distance" class="meter-fill meter-distance"></div></div>
+      </div>
+      <div class="meter">
+        <span class="meter-label">Sanity</span>
+        <div class="meter-track"><div id="meter-sanity" class="meter-fill meter-sanity"></div></div>
+      </div>
+      <div class="meter">
+        <span class="meter-label">Baterai senter</span>
+        <div class="meter-track"><div id="meter-battery" class="meter-fill meter-battery"></div></div>
+      </div>
+    </aside>
+
+    <!-- Senjata yang sedang dipegang -->
+    <div id="weapon-slot" class="weapon-slot hidden" aria-live="polite">
+      <span class="weapon-slot-label">Senjata</span>
+      <span id="weapon-slot-name" class="weapon-slot-name">Belum ada</span>
+      <span id="weapon-slot-uses" class="weapon-slot-uses"></span>
+    </div>
+
+    <!-- Pengumuman ruangan -->
+    <div id="room-banner" class="room-banner hidden" aria-live="assertive">
+      <p id="room-banner-text">Ruangan 1</p>
+    </div>
+
+    <!-- Menu utama -->
+    <section id="screen-menu" class="screen">
+      <h1 class="title">Malam Kuis Angker</h1>
+      <p class="lead">Rumah tua ini dihuni hantu. Jawab soal dalam 15 detik untuk mendapatkan senjata, lalu pukul hantu sebelum mereka menangkapmu.</p>
+      <p class="warning">Peringatan: ada satu efek kejut ringan dan suara tiba-tiba. Kecilkan volume jika perlu.</p>
+      <div class="menu-actions">
+        <button id="btn-start" class="btn btn-primary">Masuk rumah</button>
+        <button id="btn-howto" class="btn">Cara bermain</button>
+        <button id="btn-bestiary" class="btn">Koleksi hantu</button>
+      </div>
+      <p class="highscore">Skor tertinggi: <span id="menu-highscore">0</span></p>
+    </section>
+
+    <!-- Cara bermain -->
+    <section id="screen-howto" class="screen hidden">
+      <h2 class="screen-title">Cara bermain</h2>
+      <ul class="howto-list">
+        <li><strong>Hantu mendekat:</strong> perhatikan bar jarak hantu. Kalau habis, kamu tertangkap.</li>
+        <li><strong>Kuis:</strong> jawab soal pengetahuan umum dalam 15 detik.</li>
+        <li><strong>Jawaban benar:</strong> kamu mendapat senjata. Tap atau klik hantu untuk memukulnya.</li>
+        <li><strong>Jawaban cepat:</strong> menjawab di 5 detik pertama memberi pukulan kritis.</li>
+        <li><strong>Jawaban salah atau waktu habis:</strong> hantu maju mendekat dan sanity berkurang.</li>
+        <li><strong>Boss:</strong> setiap akhir lantai ada hantu besar yang butuh beberapa soal berturut-turut.</li>
+        <li><strong>Baterai senter:</strong> semakin lemah seiring waktu. Jawaban benar mengisinya kembali.</li>
+      </ul>
+      <button id="btn-howto-back" class="btn btn-primary">Kembali</button>
+    </section>
+
+    <!-- Koleksi hantu -->
+    <section id="screen-bestiary" class="screen hidden">
+      <h2 class="screen-title">Koleksi hantu</h2>
+      <p class="lead">Kalahkan hantu untuk membuka datanya.</p>
+      <ul id="bestiary-list" class="bestiary-list">
+        <li class="bestiary-item" data-ghost="pocong">
+          <span class="bestiary-name">???</span>
+          <span class="bestiary-desc">Belum ditemukan.</span>
+        </li>
+        <li class="bestiary-item" data-ghost="kuntilanak">
+          <span class="bestiary-name">???</span>
+          <span class="bestiary-desc">Belum ditemukan.</span>
+        </li>
+        <li class="bestiary-item" data-ghost="tuyul">
+          <span class="bestiary-name">???</span>
+          <span class="bestiary-desc">Belum ditemukan.</span>
+        </li>
+        <li class="bestiary-item" data-ghost="genderuwo">
+          <span class="bestiary-name">???</span>
+          <span class="bestiary-desc">Belum ditemukan.</span>
+        </li>
+      </ul>
+      <button id="btn-bestiary-back" class="btn btn-primary">Kembali</button>
+    </section>
+
+    <!-- Quiz -->
+    <section id="screen-quiz" class="screen screen-quiz hidden" aria-labelledby="quiz-question">
+      <div class="quiz-head">
+        <p class="quiz-meta">Tantangan &ndash; Ruangan <span id="quiz-room">1</span></p>
+        <p class="quiz-timer" aria-live="off"><span id="quiz-time">15</span> detik</p>
+      </div>
+      <div class="timer-track" aria-hidden="true">
+        <div id="timer-fill" class="timer-fill"></div>
+      </div>
+      <h2 id="quiz-question" class="quiz-question">Pertanyaan muncul di sini.</h2>
+      <div id="quiz-options" class="quiz-options" role="group" aria-label="Pilihan jawaban">
+        <button class="option" data-index="0"></button>
+        <button class="option" data-index="1"></button>
+        <button class="option" data-index="2"></button>
+        <button class="option" data-index="3"></button>
+      </div>
+      <p id="quiz-feedback" class="quiz-feedback" aria-live="assertive"></p>
+    </section>
+
+    <!-- Tombol serang (setelah jawaban benar) -->
+    <div id="attack-panel" class="attack-panel hidden">
+      <p id="attack-hint" class="attack-hint">Tap hantu untuk memukul!</p>
+      <button id="btn-attack" class="btn btn-primary btn-attack">Pukul!</button>
+    </div>
+
+    <!-- Jeda -->
+    <section id="screen-pause" class="screen hidden">
+      <h2 class="screen-title">Permainan dijeda</h2>
+      <div class="menu-actions">
+        <button id="btn-resume" class="btn btn-primary">Lanjutkan</button>
+        <button id="btn-quit" class="btn">Keluar ke menu</button>
+      </div>
+    </section>
+
+    <!-- Game over -->
+    <section id="screen-gameover" class="screen hidden">
+      <h2 id="gameover-title" class="screen-title">Kamu tertangkap</h2>
+      <p id="gameover-reason" class="lead">Hantu berhasil menangkapmu.</p>
+      <dl class="result">
+        <div><dt>Skor akhir</dt><dd id="result-score">0</dd></div>
+        <div><dt>Ruangan dicapai</dt><dd id="result-room">1</dd></div>
+        <div><dt>Hantu dikalahkan</dt><dd id="result-ghosts">0</dd></div>
+        <div><dt>Skor tertinggi</dt><dd id="result-highscore">0</dd></div>
+      </dl>
+      <p id="result-newrecord" class="newrecord hidden">Rekor baru!</p>
+      <div class="menu-actions">
+        <button id="btn-retry" class="btn btn-primary">Coba lagi</button>
+        <button id="btn-menu" class="btn">Menu utama</button>
+      </div>
+    </section>
+
+    <!-- Tombol jeda & suara -->
+    <div id="toolbar" class="toolbar hidden">
+      <button id="btn-pause" class="icon-btn" aria-label="Jeda">Jeda</button>
+      <button id="btn-sound" class="icon-btn" aria-label="Nyalakan atau matikan suara" aria-pressed="true">Suara: nyala</button>
+    </div>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
