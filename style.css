@@ -1,0 +1,1047 @@
+/* ==========================================================
+   Malam Kuis Angker - style.css
+   ========================================================== */
+
+:root {
+  --night: #0a0710;
+  --wall: #1a1424;
+  --wall-light: #2a2038;
+  --floor: #120d19;
+  --line: #3a2d4d;
+  --text: #efe9f7;
+  --text-dim: #a89bbd;
+  --candle: #ffbf5e;
+  --ecto: #7dffb0;
+  --blood: #d6304a;
+  --good: #5be28f;
+  --bad: #ff4d6a;
+  --overlay: rgba(8, 5, 14, 0.9);
+  --radius: 14px;
+  --font-body: "Trebuchet MS", "Segoe UI", Tahoma, sans-serif;
+  --font-display: "Palatino Linotype", "Book Antiqua", Georgia, serif;
+
+  /* Variabel yang diatur dari JavaScript */
+  --ghost-scale: 0.45;      /* 0.45 (jauh) sampai 1.6 (dekat) */
+  --vignette: 0.45;         /* 0 sampai 1 */
+  --light: 1;               /* 0 sampai 1, kecerahan ruangan */
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: var(--night);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.45;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.hidden {
+  display: none !important;
+}
+
+:focus-visible {
+  outline: 3px solid var(--candle);
+  outline-offset: 3px;
+}
+
+/* ---------- Kontainer game ---------- */
+
+.game {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--night);
+}
+
+.game.shake {
+  animation: shake 0.3s linear;
+}
+
+@keyframes shake {
+  0%   { transform: translate(0, 0); }
+  20%  { transform: translate(-8px, 4px); }
+  40%  { transform: translate(7px, -5px); }
+  60%  { transform: translate(-6px, -3px); }
+  80%  { transform: translate(5px, 5px); }
+  100% { transform: translate(0, 0); }
+}
+
+/* ---------- Adegan ruangan ---------- */
+
+.scene {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.room {
+  position: absolute;
+  inset: 0;
+  filter: brightness(calc(0.35 + var(--light) * 0.65));
+  transition: filter 0.25s ease;
+}
+
+.room-wall {
+  position: absolute;
+  inset: 0 0 32% 0;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 58px, rgba(255, 255, 255, 0.025) 58px 60px),
+    linear-gradient(180deg, var(--wall-light) 0%, var(--wall) 100%);
+}
+
+.room-floor {
+  position: absolute;
+  inset: 68% 0 0 0;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 78px, rgba(0, 0, 0, 0.35) 78px 80px),
+    linear-gradient(180deg, #1b1426 0%, var(--floor) 100%);
+  border-top: 4px solid #0d0914;
+}
+
+.room-door {
+  position: absolute;
+  left: 8%;
+  bottom: 32%;
+  width: clamp(70px, 14vw, 130px);
+  height: clamp(130px, 28vh, 240px);
+  border: 5px solid #0d0914;
+  border-radius: 6px 6px 0 0;
+  background: linear-gradient(90deg, #3a2a22, #2a1d18);
+}
+
+.room-door::after {
+  content: "";
+  position: absolute;
+  right: 12%;
+  top: 52%;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--candle);
+}
+
+.room-window {
+  position: absolute;
+  right: 10%;
+  top: 14%;
+  width: clamp(80px, 16vw, 150px);
+  height: clamp(100px, 22vh, 180px);
+  border: 6px solid #0d0914;
+  border-radius: 4px;
+  background:
+    linear-gradient(90deg, transparent 48%, #0d0914 48% 52%, transparent 52%),
+    linear-gradient(0deg, transparent 48%, #0d0914 48% 52%, transparent 52%),
+    linear-gradient(180deg, #1c2a4a, #0d1226);
+  box-shadow: inset 0 0 28px rgba(150, 180, 255, 0.18);
+}
+
+/* ---------- Hantu ---------- */
+
+.ghost {
+  position: absolute;
+  left: 50%;
+  bottom: 30%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  border: 0;
+  background: none;
+  transform: translateX(-50%) scale(var(--ghost-scale));
+  transform-origin: 50% 100%;
+  transition: transform 0.6s ease-out;
+  animation: ghost-float 2.4s ease-in-out infinite;
+}
+
+.ghost.appear {
+  animation: ghost-appear 0.8s ease-out, ghost-float 2.4s ease-in-out 0.8s infinite;
+}
+
+.ghost.hit {
+  animation: ghost-hit 0.35s linear;
+}
+
+.ghost.dead {
+  animation: ghost-dead 0.7s ease-in forwards;
+  pointer-events: none;
+}
+
+.ghost.targetable {
+  cursor: crosshair;
+  filter: drop-shadow(0 0 14px rgba(255, 191, 94, 0.55));
+}
+
+@keyframes ghost-float {
+  0%, 100% { margin-bottom: 0; }
+  50%      { margin-bottom: 14px; }
+}
+
+@keyframes ghost-appear {
+  0%   { opacity: 0; filter: blur(8px); }
+  60%  { opacity: 0.4; }
+  100% { opacity: 1; filter: blur(0); }
+}
+
+@keyframes ghost-hit {
+  0%   { filter: brightness(3) saturate(0); }
+  25%  { transform: translateX(calc(-50% - 14px)) scale(var(--ghost-scale)); }
+  50%  { transform: translateX(calc(-50% + 14px)) scale(var(--ghost-scale)); }
+  100% { filter: none; }
+}
+
+@keyframes ghost-dead {
+  0%   { opacity: 1; }
+  100% { opacity: 0; transform: translateX(-50%) scale(calc(var(--ghost-scale) * 0.4)) translateY(-60px); filter: blur(10px); }
+}
+
+.ghost-name {
+  padding: 3px 12px;
+  border-radius: 999px;
+  background: rgba(10, 7, 16, 0.75);
+  color: var(--ecto);
+  font-family: var(--font-display);
+  font-size: 1rem;
+  letter-spacing: 0.04em;
+}
+
+.ghost-hp {
+  display: block;
+  width: 130px;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  overflow: hidden;
+}
+
+.ghost-hp-fill {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--blood);
+  transition: width 0.3s ease-out;
+}
+
+/* Tubuh hantu (digambar dengan CSS) */
+.ghost-body {
+  position: relative;
+  display: block;
+  width: 110px;
+  height: 190px;
+  border-radius: 50px 50px 24px 24px;
+  background: linear-gradient(180deg, #f1ede4, #cfc8b8);
+  box-shadow: 0 0 30px rgba(220, 230, 255, 0.25);
+}
+
+.ghost-body::before,
+.ghost-body::after {
+  content: "";
+  position: absolute;
+  top: 38px;
+  width: 16px;
+  height: 22px;
+  border-radius: 50%;
+  background: #0b0710;
+  box-shadow: 0 0 10px rgba(214, 48, 74, 0.7);
+}
+
+.ghost-body::before { left: 28px; }
+.ghost-body::after  { right: 28px; }
+
+/* Pocong: terbungkus kain putih, diikat di atas dan bawah */
+.ghost.type-pocong .ghost-body {
+  width: 96px;
+  height: 200px;
+  border-radius: 48px 48px 14px 14px;
+}
+
+.ghost.type-pocong .ghost-body::before,
+.ghost.type-pocong .ghost-body::after {
+  top: 52px;
+}
+
+/* Kuntilanak: gaun putih panjang, rambut hitam panjang */
+.ghost.type-kuntilanak .ghost-body {
+  width: 118px;
+  height: 210px;
+  border-radius: 56px 56px 6px 6px;
+  background:
+    linear-gradient(180deg, #14101c 0 38%, transparent 38%),
+    linear-gradient(180deg, #f6f2ea, #d6cfc0);
+  clip-path: polygon(8% 0, 92% 0, 100% 100%, 82% 92%, 64% 100%, 46% 92%, 28% 100%, 10% 92%, 0 100%);
+}
+
+.ghost.type-kuntilanak .ghost-body::before,
+.ghost.type-kuntilanak .ghost-body::after {
+  top: 62px;
+  background: var(--blood);
+  box-shadow: 0 0 12px rgba(214, 48, 74, 0.9);
+}
+
+/* Tuyul: kecil, botak, kulit kehijauan */
+.ghost.type-tuyul .ghost-body {
+  width: 80px;
+  height: 105px;
+  border-radius: 40px 40px 18px 18px;
+  background: linear-gradient(180deg, #a4c9a0, #6f9a6c);
+  box-shadow: 0 0 22px rgba(125, 255, 176, 0.25);
+}
+
+.ghost.type-tuyul .ghost-body::before,
+.ghost.type-tuyul .ghost-body::after {
+  top: 30px;
+  width: 14px;
+  height: 18px;
+  background: #fff6c2;
+  box-shadow: 0 0 10px rgba(255, 246, 194, 0.8);
+}
+
+.ghost.type-tuyul .ghost-body::before { left: 17px; }
+.ghost.type-tuyul .ghost-body::after  { right: 17px; }
+
+/* Genderuwo: besar, gelap, berbulu */
+.ghost.type-genderuwo .ghost-body {
+  width: 170px;
+  height: 215px;
+  border-radius: 80px 80px 30px 30px;
+  background: linear-gradient(180deg, #3b2a2a, #1b1212);
+  box-shadow: 0 0 36px rgba(214, 48, 74, 0.28);
+}
+
+.ghost.type-genderuwo .ghost-body::before,
+.ghost.type-genderuwo .ghost-body::after {
+  top: 56px;
+  width: 22px;
+  height: 22px;
+  background: #ffcf5e;
+  box-shadow: 0 0 16px rgba(255, 207, 94, 0.9);
+}
+
+.ghost.type-genderuwo .ghost-body::before { left: 44px; }
+.ghost.type-genderuwo .ghost-body::after  { right: 44px; }
+
+/* Boss: lebih besar dan menyala */
+.ghost.boss .ghost-body {
+  filter: drop-shadow(0 0 22px rgba(214, 48, 74, 0.7));
+}
+
+.ghost.boss .ghost-hp {
+  width: 200px;
+  height: 12px;
+}
+
+/* ---------- Efek senjata & damage ---------- */
+
+.weapon-fx {
+  position: absolute;
+  left: 50%;
+  bottom: 40%;
+  width: 150px;
+  height: 150px;
+  margin-left: -75px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.95) 0%, rgba(255, 191, 94, 0.7) 35%, transparent 70%);
+  pointer-events: none;
+  animation: weapon-hit 0.4s ease-out forwards;
+}
+
+.weapon-fx.fx-salt {
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.95), rgba(220, 230, 255, 0.5) 45%, transparent 72%);
+  width: 220px;
+  height: 220px;
+  margin-left: -110px;
+}
+
+.weapon-fx.fx-uv {
+  background: radial-gradient(circle, rgba(200, 160, 255, 0.95), rgba(140, 90, 255, 0.55) 40%, transparent 72%);
+}
+
+.weapon-fx.fx-bell {
+  background: radial-gradient(circle, rgba(255, 255, 255, 1), rgba(160, 220, 255, 0.7) 40%, transparent 75%);
+  width: 260px;
+  height: 260px;
+  margin-left: -130px;
+}
+
+@keyframes weapon-hit {
+  0%   { opacity: 0; transform: scale(0.4); }
+  30%  { opacity: 1; }
+  100% { opacity: 0; transform: scale(1.5); }
+}
+
+.damage-pop {
+  position: absolute;
+  left: 50%;
+  bottom: 52%;
+  transform: translateX(-50%);
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 8vw, 3.2rem);
+  font-weight: 700;
+  color: var(--candle);
+  text-shadow: 0 3px 14px rgba(0, 0, 0, 0.8);
+  pointer-events: none;
+  animation: damage-rise 0.9s ease-out forwards;
+}
+
+.damage-pop.crit {
+  color: var(--blood);
+  font-size: clamp(2.6rem, 10vw, 4.2rem);
+}
+
+@keyframes damage-rise {
+  0%   { opacity: 0; transform: translate(-50%, 10px) scale(0.7); }
+  20%  { opacity: 1; transform: translate(-50%, 0) scale(1.1); }
+  100% { opacity: 0; transform: translate(-50%, -60px) scale(1); }
+}
+
+/* ---------- Vignette, kedip lampu, jumpscare ---------- */
+
+.vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 25%, rgba(0, 0, 0, 0.95) 100%);
+  opacity: var(--vignette);
+  transition: opacity 0.4s ease;
+}
+
+.flicker {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: #000;
+  opacity: 0;
+}
+
+.flicker.on {
+  animation: flicker 0.6s steps(1, end);
+}
+
+@keyframes flicker {
+  0%   { opacity: 0; }
+  10%  { opacity: 0.85; }
+  20%  { opacity: 0; }
+  35%  { opacity: 0.6; }
+  45%  { opacity: 0; }
+  60%  { opacity: 0.9; }
+  75%  { opacity: 0.1; }
+  100% { opacity: 0; }
+}
+
+.jumpscare {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle, #3b0610 0%, #000 75%);
+  animation: jump 0.7s ease-out forwards;
+}
+
+.jumpscare-text {
+  font-family: var(--font-display);
+  font-size: clamp(4rem, 22vw, 11rem);
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 0 40px var(--blood);
+}
+
+@keyframes jump {
+  0%   { opacity: 0; transform: scale(0.6); }
+  15%  { opacity: 1; transform: scale(1.15); }
+  60%  { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.05); }
+}
+
+/* ---------- HUD ---------- */
+
+.hud {
+  position: absolute;
+  top: env(safe-area-inset-top, 0px);
+  left: 0;
+  right: 0;
+  z-index: 5;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 12px 16px 8px;
+  pointer-events: none;
+}
+
+.hud-item {
+  display: flex;
+  flex-direction: column;
+  min-width: 64px;
+}
+
+.hud-label {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+}
+
+.hud-value {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+#hud-lives {
+  color: var(--blood);
+}
+
+#hud-streak {
+  color: var(--candle);
+}
+
+/* ---------- Meter ---------- */
+
+.meters {
+  position: absolute;
+  top: calc(env(safe-area-inset-top, 0px) + 66px);
+  left: 16px;
+  z-index: 5;
+  display: grid;
+  gap: 8px;
+  width: min(220px, 52vw);
+  pointer-events: none;
+}
+
+.meter-label {
+  display: block;
+  margin-bottom: 2px;
+  font-size: 0.72rem;
+  color: var(--text-dim);
+}
+
+.meter-track {
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+}
+
+.meter-fill {
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  transition: width 0.3s ease-out, background 0.3s ease;
+}
+
+.meter-distance { background: var(--blood); }
+.meter-sanity   { background: var(--ecto); }
+.meter-battery  { background: var(--candle); }
+
+.meter-fill.low {
+  animation: pulse 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes pulse {
+  from { opacity: 1; }
+  to   { opacity: 0.5; }
+}
+
+/* ---------- Slot senjata ---------- */
+
+.weapon-slot {
+  position: absolute;
+  top: calc(env(safe-area-inset-top, 0px) + 66px);
+  right: 16px;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: rgba(20, 14, 30, 0.75);
+  pointer-events: none;
+}
+
+.weapon-slot-label {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+}
+
+.weapon-slot-name {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  color: var(--candle);
+}
+
+.weapon-slot-uses {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+}
+
+/* ---------- Banner ruangan ---------- */
+
+.room-banner {
+  position: absolute;
+  top: 36%;
+  left: 0;
+  right: 0;
+  z-index: 6;
+  text-align: center;
+  pointer-events: none;
+  animation: banner 1.9s ease-out forwards;
+}
+
+.room-banner p {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 8vw, 3.8rem);
+  color: var(--ecto);
+  text-shadow: 0 4px 28px rgba(125, 255, 176, 0.4);
+}
+
+@keyframes banner {
+  0%   { opacity: 0; transform: scale(0.85); }
+  18%  { opacity: 1; transform: scale(1); }
+  75%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* ---------- Toolbar ---------- */
+
+.toolbar {
+  position: absolute;
+  right: 16px;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
+  z-index: 5;
+  display: flex;
+  gap: 8px;
+}
+
+.icon-btn {
+  padding: 8px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(20, 14, 30, 0.8);
+  font-size: 0.85rem;
+}
+
+.icon-btn:hover {
+  border-color: var(--ecto);
+}
+
+/* ---------- Panel serang ---------- */
+
+.attack-panel {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 0 16px;
+}
+
+.attack-hint {
+  margin: 0;
+  padding: 4px 14px;
+  border-radius: 999px;
+  background: rgba(10, 7, 16, 0.8);
+  color: var(--candle);
+  font-weight: 700;
+}
+
+.btn-attack {
+  min-width: 200px;
+  padding: 16px 32px;
+  font-size: 1.2rem;
+  animation: attack-pulse 0.9s ease-in-out infinite alternate;
+}
+
+@keyframes attack-pulse {
+  from { box-shadow: 0 0 0 0 rgba(125, 255, 176, 0.5); }
+  to   { box-shadow: 0 0 0 12px rgba(125, 255, 176, 0); }
+}
+
+/* ---------- Layar overlay ---------- */
+
+.screen {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: calc(env(safe-area-inset-top, 0px) + 24px) 24px calc(env(safe-area-inset-bottom, 0px) + 24px);
+  background: var(--overlay);
+  text-align: center;
+  overflow-y: auto;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(2.4rem, 10vw, 5rem);
+  line-height: 1.05;
+  letter-spacing: 0.01em;
+  color: var(--ecto);
+  text-shadow: 0 6px 34px rgba(125, 255, 176, 0.3);
+}
+
+.screen-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.7rem, 6vw, 2.7rem);
+  line-height: 1.1;
+}
+
+.lead {
+  max-width: 34rem;
+  margin: 0;
+  color: var(--text-dim);
+}
+
+.warning {
+  max-width: 30rem;
+  margin: 0;
+  padding: 8px 14px;
+  border-left: 4px solid var(--candle);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  background: rgba(255, 191, 94, 0.08);
+  color: var(--candle);
+  font-size: 0.9rem;
+  text-align: left;
+}
+
+.highscore {
+  margin: 8px 0 0;
+  color: var(--text-dim);
+}
+
+.highscore span {
+  color: var(--candle);
+  font-weight: 700;
+}
+
+/* ---------- Tombol ---------- */
+
+.menu-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.btn {
+  min-width: 160px;
+  padding: 14px 24px;
+  border: 2px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--wall);
+  font-weight: 700;
+  transition: transform 0.12s ease, border-color 0.12s ease, background 0.12s ease;
+}
+
+.btn:hover {
+  border-color: var(--ecto);
+}
+
+.btn:active {
+  transform: translateY(2px);
+}
+
+.btn-primary {
+  border-color: var(--ecto);
+  background: var(--ecto);
+  color: #07130c;
+}
+
+.btn-primary:hover {
+  background: #a6ffcb;
+}
+
+/* ---------- Cara bermain ---------- */
+
+.howto-list {
+  max-width: 34rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+  display: grid;
+  gap: 10px;
+}
+
+.howto-list li {
+  padding: 12px 16px;
+  border-left: 4px solid var(--ecto);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  background: rgba(42, 32, 56, 0.7);
+}
+
+/* ---------- Koleksi hantu ---------- */
+
+.bestiary-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  width: min(100%, 36rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.bestiary-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius);
+  background: rgba(20, 14, 30, 0.7);
+  text-align: left;
+  opacity: 0.65;
+}
+
+.bestiary-item.found {
+  border-style: solid;
+  border-color: var(--ecto);
+  opacity: 1;
+}
+
+.bestiary-name {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  color: var(--ecto);
+}
+
+.bestiary-desc {
+  font-size: 0.9rem;
+  color: var(--text-dim);
+}
+
+/* ---------- Quiz ---------- */
+
+.screen-quiz {
+  gap: 14px;
+  background: rgba(8, 5, 14, 0.82);
+}
+
+.quiz-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  width: min(100%, 40rem);
+}
+
+.quiz-meta {
+  margin: 0;
+  color: var(--text-dim);
+  font-weight: 700;
+}
+
+.quiz-timer {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.7rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--candle);
+}
+
+.timer-track {
+  width: min(100%, 40rem);
+  height: 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+}
+
+.timer-fill {
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--ecto);
+  transition: width 0.1s linear, background 0.3s ease;
+}
+
+.timer-fill.warning {
+  background: var(--candle);
+}
+
+.timer-fill.danger {
+  background: var(--blood);
+  animation: pulse 0.4s ease-in-out infinite alternate;
+}
+
+.quiz-question {
+  width: min(100%, 40rem);
+  margin: 8px 0 4px;
+  font-size: clamp(1.25rem, 4.5vw, 1.8rem);
+  line-height: 1.3;
+}
+
+.quiz-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  width: min(100%, 40rem);
+}
+
+.option {
+  min-height: 64px;
+  padding: 12px 16px;
+  border: 2px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--wall);
+  font-weight: 700;
+  text-align: left;
+  transition: transform 0.12s ease, border-color 0.12s ease, background 0.12s ease;
+}
+
+.option:hover:not(:disabled) {
+  border-color: var(--ecto);
+  transform: translateY(-2px);
+}
+
+.option:disabled {
+  cursor: default;
+  opacity: 0.7;
+}
+
+.option.correct {
+  border-color: var(--good);
+  background: rgba(91, 226, 143, 0.2);
+  opacity: 1;
+}
+
+.option.wrong {
+  border-color: var(--bad);
+  background: rgba(255, 77, 106, 0.2);
+  opacity: 1;
+}
+
+.quiz-feedback {
+  min-height: 1.5em;
+  margin: 0;
+  font-weight: 700;
+}
+
+.quiz-feedback.good { color: var(--good); }
+.quiz-feedback.bad  { color: var(--bad); }
+
+/* ---------- Hasil game over ---------- */
+
+.result {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  width: min(100%, 28rem);
+  margin: 0;
+}
+
+.result div {
+  padding: 14px;
+  border-radius: var(--radius);
+  background: rgba(42, 32, 56, 0.75);
+}
+
+.result dt {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+}
+
+.result dd {
+  margin: 4px 0 0;
+  font-family: var(--font-display);
+  font-size: 1.7rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.newrecord {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  color: var(--candle);
+  animation: pulse 0.7s ease-in-out infinite alternate;
+}
+
+/* ---------- Responsif ---------- */
+
+@media (max-width: 520px) {
+  .hud {
+    padding: 10px 12px 6px;
+  }
+
+  .hud-value {
+    font-size: 1.15rem;
+  }
+
+  .meters {
+    left: 12px;
+    width: 46vw;
+  }
+
+  .weapon-slot {
+    right: 12px;
+    padding: 6px 10px;
+  }
+
+  .quiz-options,
+  .bestiary-list {
+    grid-template-columns: 1fr;
+  }
+
+  .btn {
+    min-width: 140px;
+  }
+}
+
+@media (max-height: 520px) and (orientation: landscape) {
+  .screen {
+    justify-content: flex-start;
+    gap: 10px;
+  }
+
+  .title {
+    font-size: 2.2rem;
+  }
+
+  .ghost {
+    bottom: 22%;
+  }
+}
+
+/* ---------- Kurangi gerakan ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
