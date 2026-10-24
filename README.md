@@ -1,1 +1,1 @@
-# indonesianhorror
+# indonesianhorror adalah game yang kami buat untuk menghibur pemain sekaligus melatih edukasi pemain dengan soal-soal pengetahuan umum yang kami buat secara random dan memiliki banyak variasi soal. Pemain yang menjawab soal dengan benar akan mendapatkan senjata yang digunakan untuk menyerang hantu-hantu yang ada di hadapan pemain. Pemain harus menjawab soal dengan cepat karena hantu akan semakin dekat. Game ini bisa dimainkan oleh semua kalangan, khususnya para remaja yang ingin bermain game namun tetap ingin ada edukasinya. 
