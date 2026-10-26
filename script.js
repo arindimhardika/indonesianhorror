@@ -913,9 +913,6 @@ function renderLogbook() {
   }
 
   function endGame(reason) {
-    state = 'gameover';
-
-     function endGame(reason) {
   state = 'gameover';
 
   addLogbookEntry(
@@ -925,31 +922,30 @@ function renderLogbook() {
   );
 
   phase = 'idle';
-    phase = 'idle';
-    timers = [];
-    setPlayingUI(false);
+  timers = [];
+  setPlayingUI(false);
 
-    if (reason === 'sanity') {
-      el.gameoverTitle.textContent = 'Kamu kehilangan akal';
-      el.gameoverReason.textContent = 'Sanity-mu habis. Kamu tak sanggup lagi bertahan di rumah ini.';
-    } else {
-      el.gameoverTitle.textContent = 'Kamu tertangkap';
-      el.gameoverReason.textContent = 'Hantu berhasil menangkapmu.';
-    }
-
-    const isRecord = g.score > highScore;
-    if (isRecord) {
-      highScore = g.score;
-      saveHigh(highScore);
-    }
-    el.resScore.textContent = String(g.score);
-    el.resRoom.textContent = String(g.room);
-    el.resGhosts.textContent = String(g.defeated);
-    el.resHigh.textContent = String(highScore);
-    el.resNew.classList.toggle('hidden', !isRecord);
-    el.menuHigh.textContent = String(highScore);
-    showScreen('gameover');
+  if (reason === 'sanity') {
+    el.gameoverTitle.textContent = 'Kamu kehilangan akal';
+    el.gameoverReason.textContent = 'Sanity-mu habis. Kamu tak sanggup lagi bertahan di rumah ini.';
+  } else {
+    el.gameoverTitle.textContent = 'Kamu tertangkap';
+    el.gameoverReason.textContent = 'Hantu berhasil menangkapmu.';
   }
+
+  const isRecord = g.score > highScore;
+  if (isRecord) {
+    highScore = g.score;
+    saveHigh(highScore);
+  }
+  el.resScore.textContent = String(g.score);
+  el.resRoom.textContent = String(g.room);
+  el.resGhosts.textContent = String(g.defeated);
+  el.resHigh.textContent = String(highScore);
+  el.resNew.classList.toggle('hidden', !isRecord);
+  el.menuHigh.textContent = String(highScore);
+  showScreen('gameover');
+}
 
   /* ---------- Input ---------- */
   document.addEventListener('keydown', (e) => {
