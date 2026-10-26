@@ -65,12 +65,13 @@
   };
 
   const screens = {
-    menu: $('screen-menu'),
-    howto: $('screen-howto'),
-    bestiary: $('screen-bestiary'),
-    quiz: $('screen-quiz'),
-    gameover: $('screen-gameover')
-  };
+  menu: $('screen-menu'),
+  howto: $('screen-howto'),
+  bestiary: $('screen-bestiary'),
+  quiz: $('screen-quiz'),
+  gameover: $('screen-gameover'),
+  logbook: $('ai-logbook')
+};
   const pauseScreen = $('screen-pause');
 
   /* ---------- Konstanta ---------- */
