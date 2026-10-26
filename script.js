@@ -490,6 +490,9 @@ function renderLogbook() {
   function startGame() {
     ensureAudio();
     newGame();
+
+      addLogbookEntry('Permainan baru dimulai.');
+     
     state = 'playing';
     showScreen(null);
     pauseScreen.classList.add('hidden');
@@ -614,6 +617,11 @@ function renderLogbook() {
 
     const remain = Math.max(0, quiz.remaining);
     const ok = index === quiz.correctIndex;
+
+     addLogbookEntry(
+  (ok ? 'Jawaban benar: ' : 'Jawaban salah atau waktu habis: ')
+  + quiz.q[0]
+);
 
     el.options.forEach((btn, i) => {
       btn.disabled = true;
@@ -756,6 +764,12 @@ function renderLogbook() {
 
     const gh = g.ghost;
     g.defeated++;
+     
+     addLogbookEntry(
+  'Mengalahkan ' + gh.def.name +
+  ' di ruangan ' + g.room
+);
+
     g.score += 100 * g.room + (gh.boss ? 500 : 0);
     g.sanity = Math.min(100, g.sanity + 20);
     g.battery = Math.min(100, g.battery + 10);
@@ -900,6 +914,17 @@ function renderLogbook() {
 
   function endGame(reason) {
     state = 'gameover';
+
+     function endGame(reason) {
+  state = 'gameover';
+
+  addLogbookEntry(
+    'Permainan berakhir. Skor: ' + g.score +
+    ', ruangan: ' + g.room +
+    ', hantu dikalahkan: ' + g.defeated
+  );
+
+  phase = 'idle';
     phase = 'idle';
     timers = [];
     setPlayingUI(false);
@@ -961,6 +986,14 @@ function renderLogbook() {
     showScreen('bestiary');
   });
   $('btn-bestiary-back').addEventListener('click', () => showScreen('menu'));
+   $('btn-logbook').addEventListener('click', () => {
+  renderLogbook();
+  showScreen('logbook');
+});
+
+$('btn-logbook-back').addEventListener('click', () => {
+  showScreen('menu');
+});
   $('btn-retry').addEventListener('click', startGame);
   $('btn-menu').addEventListener('click', goMenu);
   $('btn-resume').addEventListener('click', resumeGame);
