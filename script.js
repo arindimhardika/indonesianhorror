@@ -173,7 +173,65 @@
   let cssCache = {};
   let audioCtx = null;
   let soundOn = true;
+   
+/* ---------- AI Logbook ---------- */
+const LOGBOOK_KEY = 'malamKuisAngkerLogbook';
 
+function addLogbookEntry(message) {
+  const list = $('ai-logbook-list');
+  if (!list) return;
+
+  const entry = {
+    time: new Date().toLocaleTimeString('id-ID'),
+    message: message
+  };
+
+  let logs = [];
+  try {
+    logs = JSON.parse(localStorage.getItem(LOGBOOK_KEY)) || [];
+  } catch (e) {
+    logs = [];
+  }
+
+  logs.unshift(entry);
+  logs = logs.slice(0, 100);
+
+  try {
+    localStorage.setItem(LOGBOOK_KEY, JSON.stringify(logs));
+  } catch (e) {
+    // Permainan tetap berjalan jika penyimpanan tidak tersedia.
+  }
+
+  renderLogbook();
+}
+
+function renderLogbook() {
+  const list = $('ai-logbook-list');
+  if (!list) return;
+
+  let logs = [];
+  try {
+    logs = JSON.parse(localStorage.getItem(LOGBOOK_KEY)) || [];
+  } catch (e) {
+    logs = [];
+  }
+
+  list.replaceChildren();
+
+  if (!logs.length) {
+    const item = document.createElement('li');
+    item.textContent = 'Belum ada aktivitas tercatat.';
+    list.appendChild(item);
+    return;
+  }
+
+  logs.forEach((log) => {
+    const item = document.createElement('li');
+    item.textContent = `[${log.time}] ${log.message}`;
+    list.appendChild(item);
+  });
+}
+   
   /* ---------- Penyimpanan ---------- */
   function loadHigh() {
     try { return parseInt(localStorage.getItem(HIGH_KEY), 10) || 0; } catch (e) { return 0; }
